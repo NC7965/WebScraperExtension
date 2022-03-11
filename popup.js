@@ -44,23 +44,44 @@ chrome.runtime.onMessage.addListener(function getCVInfo(json_data) {
             'Content-Type': 'application/json'
         }
     })
-        .catch(error => console.error('Error:', error))
+        .catch(error => { 
+            alert("Ha ocurrido un error al conectar con el servidor")
+            console.error('Error:', error) })
         .then(response => {
-            var url = new URL('http://127.0.0.1:8085/candidatos/report?email=' + json_data.datosExtraidos.email + '&platform=' + json_data.datosExtraidos.sitioWeb);
-            fetch(url, {
-                method: 'GET',
-                // mode: 'no-cors'
-            }).catch(error => console.log("Error:" + error))
-                .then(async res => ({
+            if(response.ok) {
+                solicitarCV(json_data)
+            } else {
+                alert("Ha ocurrido un error al intentar almacenar el CV en la base de datos")
+            }
+        });
+    
+    
+})
+function solicitarCV(json_data) {
+    var url = new URL('http://127.0.0.1:8085/candidatos/report?email=' + json_data.datosExtraidos.email + '&platform=' + json_data.datosExtraidos.sitioWeb);
+    fetch(url, {
+        method: 'GET',
+        // mode: 'no-cors'
+    }).catch(error => { 
+        alert("Ha ocurrido un error al conectar con el servidor")
+        console.error('Error:', error) }
+        )
+        .then(async res => { 
+            if(res.ok) {
+                return {errorRes: false, resObj: ({
                     blob: await res.blob(),
                     contentType: res.headers.get("content-type"),
-                   
-                })).then(resObj => {
-                    
-                    let body = new Blob([resObj.blob], { type: resObj.contentType })
+                })}
+            } else {
+                return {errorRes:true, resObj: null}
+            }
+            }).then(data => {
+                if(data.errorRes == true) {
+                    alert("Ha ocurrido un error al solicitar CV al servidor")
+                } else {
+                    let body = new Blob([data.resObj.blob], { type: data.resObj.contentType })
                     let objectURL = URL.createObjectURL(body);
                     chrome.downloads.download({ url: objectURL, filename: (json_data.datosExtraidos.nombre + ".pdf"), conflictAction: 'overwrite' })
-                });
+                }
         });
-
-})
+}
