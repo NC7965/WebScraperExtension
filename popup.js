@@ -28,6 +28,11 @@ storeDedaloKey.onclick = function storeDedaloKey() {
     checkDedaloKeyAvailability()
 }
 
+removeDedaloKey.onclick = function removeDedaloKey() {
+    chrome.storage.local.remove(['DedaloKey'])
+    checkDedaloKeyAvailability()
+}
+
 getData.onclick = async function getData() {
     chrome.tabs.query({ active: true, lastFocusedWindow: true }, tabs => {
         url = tabs[0].url
@@ -51,28 +56,53 @@ chrome.runtime.onMessage.addListener(function getCVInfo(json_data) {
     //let objectURL = URL.createObjectURL(blob);
     //chrome.downloads.download({url: objectURL, filename: ('content/cv.json'), conflictAction: 'overwrite'})
 
+    //chrome.storage.local.get(['DedaloKey'], function (LocalStorageObject) {
+        //if(LocalStorageObject.DedaloKey != undefined) {
+            //Post
+            var urlsave = new URL('http://127.0.0.1:8085/candidatos/');
 
-    //Post
-    var urlsave = new URL('http://127.0.0.1:8085/candidatos/');
-
-    fetch(urlsave, {
-        method: 'POST',
-        // mode: 'no-cors',
-        body: JSON.stringify(json_data.datosExtraidos),
-        headers: {
-            'Content-Type': 'application/json'
+            fetch(urlsave, {
+                method: 'POST',
+                // mode: 'no-cors',
+                body: JSON.stringify(json_data.datosExtraidos),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+                .catch(error => { 
+                    alert("Ha ocurrido un error al conectar con el servidor")
+                    console.error('Error:', error) })
+                .then(response => {
+                    if(response.ok) {
+                        solicitarCV(json_data)
+                    } else {
+                        alert("Ha ocurrido un error al intentar almacenar el CV en la base de datos")
+                    }
+                });
+            /*fetch('http://127.0.0.1:8085/candidatos/candidatura', {
+                method: 'POST',
+                body: JSON.stringify(json_data.datosExtraidos),
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Redmine-API-Key': LocalStorageObject.DedaloKey
+                }
+            }).catch(error => { 
+                alert("Ha ocurrido un error al conectar con el servidor")
+                console.error('Error:', error) })
+            .then(response => {
+                if(response.ok) {
+                    alert("OKAY")
+                } else {
+                    //alert("Ha ocurrido un error al intentar almacenar el CV en la base de datos")
+                    alert("ERROR")
+                }
+            });*/
+        /*} else {
+            alert("Clave de acceso de la API (Dedalo) sin definir")
+            checkDedaloKeyAvailability()
         }
-    })
-        .catch(error => { 
-            alert("Ha ocurrido un error al conectar con el servidor")
-            console.error('Error:', error) })
-        .then(response => {
-            if(response.ok) {
-                solicitarCV(json_data)
-            } else {
-                alert("Ha ocurrido un error al intentar almacenar el CV en la base de datos")
-            }
-        });
+
+    })*/
     
     
 })
