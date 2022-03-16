@@ -1,7 +1,7 @@
 {
     "name": "CV Scraping Extension",
     "manifest_version": 3,
-    "permissions": ["scripting", "activeTab", "declarativeContent", "downloads"],
+    "permissions": ["scripting", "activeTab", "declarativeContent", "downloads", "storage"],
     "version": "0.1",
     "description": "Extensión para extraer información de CV de webs de búsqueda de empleo/Recruiting",
     "action": {

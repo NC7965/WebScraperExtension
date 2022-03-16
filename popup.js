@@ -8,6 +8,25 @@ var retrievedLinkedin = {
     experience: false
 }
 let url = ""
+checkDedaloKeyAvailability()
+
+function checkDedaloKeyAvailability() {
+    chrome.storage.local.get(['DedaloKey'], function (result) {
+        if(result.DedaloKey == undefined) {
+            document.getElementById("GetDataButtonDiv").style.display="none"
+            document.getElementById("FormDedaloKeyDiv").style.display= "contents"
+        } else {
+            document.getElementById("FormDedaloKeyDiv").style.display= "none"
+            document.getElementById("GetDataButtonDiv").style.display="contents"
+        }
+    })
+}
+
+storeDedaloKey.onclick = function storeDedaloKey() {
+    var DedaloKey = document.getElementById("DedaloKey").value
+    chrome.storage.local.set({'DedaloKey': DedaloKey})
+    checkDedaloKeyAvailability()
+}
 
 getData.onclick = async function getData() {
     chrome.tabs.query({ active: true, lastFocusedWindow: true }, tabs => {
