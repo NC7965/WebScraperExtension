@@ -130,7 +130,7 @@ function solicitarCV(json_data) {
                 } else {
                     let body = new Blob([data.resObj.blob], { type: data.resObj.contentType })
                     let objectURL = URL.createObjectURL(body);
-                    chrome.downloads.download({ url: objectURL, filename: (json_data.datosExtraidos.nombre + ".pdf"), conflictAction: 'overwrite' })
+                    chrome.downloads.download({ url: objectURL, filename: (json_data.datosExtraidos.nombre + ".docx"), conflictAction: 'overwrite' })
                 }
         });
 }
