@@ -56,12 +56,12 @@ chrome.runtime.onMessage.addListener(function getCVInfo(json_data) {
     //let objectURL = URL.createObjectURL(blob);
     //chrome.downloads.download({url: objectURL, filename: ('content/cv.json'), conflictAction: 'overwrite'})
 
-    //chrome.storage.local.get(['DedaloKey'], function (LocalStorageObject) {
-        //if(LocalStorageObject.DedaloKey != undefined) {
+    chrome.storage.local.get(['DedaloKey'], function (LocalStorageObject) {
+        if(LocalStorageObject.DedaloKey != undefined) {
             //Post
             var urlsave = new URL('http://127.0.0.1:8085/candidatos/');
 
-            fetch(urlsave, {
+            /*fetch(urlsave, {
                 method: 'POST',
                 // mode: 'no-cors',
                 body: JSON.stringify(json_data.datosExtraidos),
@@ -78,31 +78,40 @@ chrome.runtime.onMessage.addListener(function getCVInfo(json_data) {
                     } else {
                         alert("Ha ocurrido un error al intentar almacenar el CV en la base de datos")
                     }
-                });
-            /*fetch('http://127.0.0.1:8085/candidatos/candidatura', {
+                });*/
+            fetch('http://127.0.0.1:8085/candidatos/candidatura', {
                 method: 'POST',
                 body: JSON.stringify(json_data.datosExtraidos),
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-Redmine-API-Key': LocalStorageObject.DedaloKey
+                    'Authorization': 'Bearer ' + LocalStorageObject.DedaloKey
                 }
             }).catch(error => { 
                 alert("Ha ocurrido un error al conectar con el servidor")
                 console.error('Error:', error) })
-            .then(response => {
+            .then(async function(response) {
                 if(response.ok) {
-                    alert("OKAY")
-                } else {
+                    /*var resObj = ({
+                        blob: await response.blob(),
+                        contentType: response.headers.get("content-type"),
+                    })
+                    let body = new Blob([resObj.blob], { type: resObj.contentType })
+                    let objectURL = URL.createObjectURL(body);
+                    chrome.downloads.download({ url: objectURL, filename: (json_data.datosExtraidos.nombre + ".pdf"), conflictAction: 'overwrite' })*/
+                    alert("OK")
+                } else if(response.status == 404) {
                     //alert("Ha ocurrido un error al intentar almacenar el CV en la base de datos")
-                    alert("ERROR")
+                    alert("Ha ocurrido un error, verifique su clave de acceso (Dedalo)")
+                } else {
+                    alert("Ha ocurrido un error")
                 }
-            });*/
-        /*} else {
+            });
+        } else {
             alert("Clave de acceso de la API (Dedalo) sin definir")
             checkDedaloKeyAvailability()
         }
 
-    })*/
+    })
     
     
 })
@@ -130,7 +139,7 @@ function solicitarCV(json_data) {
                 } else {
                     let body = new Blob([data.resObj.blob], { type: data.resObj.contentType })
                     let objectURL = URL.createObjectURL(body);
-                    chrome.downloads.download({ url: objectURL, filename: (json_data.datosExtraidos.nombre + ".pdf"), conflictAction: 'overwrite' })
+                    chrome.downloads.download({ url: objectURL, filename: (json_data.datosExtraidos.nombre + ".pdf"), conflictAction: 'overwrite' , saveAs: true})
                 }
         });
 }
