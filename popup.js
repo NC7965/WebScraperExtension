@@ -98,7 +98,7 @@ chrome.runtime.onMessage.addListener(function getCVInfo(json_data) {
                     let body = new Blob([resObj.blob], { type: resObj.contentType })
                     let objectURL = URL.createObjectURL(body);
                     chrome.downloads.download({ url: objectURL, filename: (json_data.datosExtraidos.nombre + ".pdf"), conflictAction: 'overwrite' })*/
-                    alert("OK")
+                    alert("Petición enviada al servidor satisfactoriamente") //TODO:: Es necesario comprobar si siempre se crean las candidaturas cuando se llega aqui, porque el alert se muestra antes de que acabe de procesar el backend
                 } else if(response.status == 404) {
                     //alert("Ha ocurrido un error al intentar almacenar el CV en la base de datos")
                     alert("Ha ocurrido un error, verifique su clave de acceso (Dedalo)")
